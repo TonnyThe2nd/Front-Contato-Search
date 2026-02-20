@@ -13,6 +13,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AdicionarContatoComponent } from '../adicionar-contato/adicionar-contato.component';
 import { AlterarContatoComponent } from '../alterar-contato/alterar-contato.component';
 
+
 @Component({
   selector: 'app-lista',
   standalone: true,
@@ -46,6 +47,7 @@ export class ListaComponent{
         this.contatos = res
       },
       (err)=>{
+        this.openMessageBox(4)
         console.log(err)
       }
     )
@@ -62,7 +64,7 @@ export class ListaComponent{
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           this.contatoService.AlterarContato(result).subscribe(updated => {
-
+            this.openMessageBox(2)
             const index = this.contatos.findIndex(c => c.id === updated.id);
             if (index > -1) this.contatos[index] = updated;
 
@@ -84,6 +86,7 @@ export class ListaComponent{
       if (result) {
         this.contatoService.AdicionarContato(result).subscribe(
           (res) => {
+            this.openMessageBox(1)
             this.contatos.push(res); 
             this.contatos = [...this.contatos]; 
           },
@@ -96,7 +99,7 @@ export class ListaComponent{
   deletarContato(id: number){
     this.contatoService.DeletarContato(id).subscribe(
       (res)=>{
-        console.log(res)
+        this.openMessageBox(3)
         this.contatos = this.contatos.filter(contato => contato.id !== id);
       },
       (err)=>{
@@ -109,8 +112,26 @@ export class ListaComponent{
     this.contatoService.BuscarPorNumero(numero).subscribe(
       (res) =>{
         this.contatos = res;
+      },(err)=>{
+        this.openMessageBox(4)
       }
     )
   }
 
+  openMessageBox(sit : number){
+    switch(sit){
+      case 1:
+        alert(`Contato adicionado com sucesso!`)
+        break;
+      case 2:
+        alert(`Contato alterado com sucesso!`)
+        break;
+      case 3:
+        alert(`Contato excluido com sucesso!`)
+        break;
+      case 4:
+        alert(`Contato não encontrado!`)
+        break;
+    }
+  }
 }
